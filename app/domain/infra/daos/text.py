@@ -13,8 +13,8 @@ from .base import (
 
 @dataclass
 class ITextDao(
-    ABC,
     IBaseDao[MT],
+    ABC,
 ):
     @abstractmethod
     async def get_by_oid(
@@ -34,6 +34,7 @@ class ITextDao(
     @abstractmethod
     async def create(
         self,
+        oid: UUID,
         content: str,
     ) -> None: ...
 

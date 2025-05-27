@@ -11,8 +11,8 @@ from domain.entities import Text
 
 @dataclass
 class ITextRepositoryOrm(
-    ABC,
     IBaseRepositoryOrm,
+    ABC,
 ):
     @abstractmethod
     async def get_by_oid(
