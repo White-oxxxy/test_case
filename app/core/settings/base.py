@@ -28,7 +28,26 @@ class RedisSettings(BaseSettings):
     port: int = Field(alias="REDIS_PORT", default=6378)
     cache_life_time: int = Field(alias="CACHE_LIFE_TIME", default=600)
 
+    @property
+    def redis_url(self) -> str:
+        return rf"redis://{self.host}"
+
+
+class RmqSettings(BaseSettings):
+    model_config = SettingsConfigDict(extra="allow")
+
+    username: str = Field(alias="RMQ_USERNAME", default="RMQ_USERNAME")
+    password: str = Field(alias="RMQ_PASSWORD", default="RMQ_PASSWORD")
+    host: str = Field(alias="RMQ_HOST", default="localhost")
+    port: int = Field(alias="RMQ_PORT", default=5672)
+
+    @property
+    def rabbit_broker_url(self) -> str:
+        return rf"amqp://{self.username}:{self.password}@{self.host}:{self.port}/"
+
+
 
 class CommonSettings(BaseSettings):
     pg: PostgresSettings
     redis: RedisSettings
+    rmq: RmqSettings

@@ -21,34 +21,34 @@ class BaseUseCase(ABC):
 
 @dataclass
 class IAddTextUseCase(
-    ABC,
     BaseUseCase,
+    ABC,
 ): ...
 
 
 @dataclass
 class IGetAllTextsUseCase(
-    ABC,
     BaseUseCase,
+    ABC,
 ): ...
 
 
 @dataclass
 class IGetTextByOidUseCase(
-    ABC,
     BaseUseCase,
+    ABC,
 ): ...
 
 
 @dataclass
 class IGetTextsByCountUseCase(
-    ABC,
     BaseUseCase,
+    ABC,
 ): ...
 
 
 @dataclass
 class IDeleteTextByOidUseCase(
-    ABC,
     BaseUseCase,
+    ABC,
 ): ...

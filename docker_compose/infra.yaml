@@ -40,10 +40,25 @@ services:
     networks:
       - backend
 
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    ports:
+      - "15672:15672"  # web ui
+      - "5672:5672"    # AMQP
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RMQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${RMQ_PASSWORD}
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - backend
+
 volumes:
   pgdata_text:
   pgadmin_text:
   redis_text:
+  rabbitmq_data:
 
 networks:
   backend:

@@ -8,13 +8,13 @@ from infra.pg.models import TextOrm
 
 @dataclass
 class TextOrmToTextDomainMapper:
-    entity_mapper: TextValuesMapper
+    value_mapper: TextValuesMapper
 
     def act(
         self,
         text_orm: TextOrm
     ) -> Text:
-        content_value: ContentValue = self.entity_mapper.get_content_value(content=text_orm.content)
+        content_value: ContentValue = self.value_mapper.get_content_value(content=text_orm.content)
         text_entity = Text(
             oid=text_orm.oid,
             content=content_value,

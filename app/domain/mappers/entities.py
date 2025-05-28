@@ -1,8 +1,11 @@
+from dataclasses import dataclass
+
 from .values import TextValuesMapper
 from domain.entities import Text
 from domain.values.text import ContentValue
 
 
+@dataclass
 class TextEntityMapper:
     value_mapper: TextValuesMapper
 

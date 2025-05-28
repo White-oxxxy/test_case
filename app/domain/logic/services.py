@@ -12,7 +12,7 @@ class BaseService(ABC): ...
 
 
 @dataclass
-class ICreateTextService(
+class IAddTextService(
     ABC,
     BaseService,
 ):

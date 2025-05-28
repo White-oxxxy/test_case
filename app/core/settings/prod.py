@@ -6,6 +6,7 @@ from core.settings.base import (
     CommonSettings,
     PostgresSettings,
     RedisSettings,
+    RmqSettings,
 )
 
 
@@ -16,6 +17,7 @@ class ProdSettings(CommonSettings):
 
         data["pg"] = PostgresSettings.model_validate(env_data)
         data["redis"] = RedisSettings.model_validate(env_data)
+        data["rmq"] = RmqSettings.model_validate(env_data)
 
         super().__init__(**data)
 

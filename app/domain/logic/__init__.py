@@ -1,6 +1,6 @@
 from .services import (
     BaseService,
-    ICreateTextService,
+    IAddTextService,
 )
 from .use_cases import (
     BaseUseCase,
@@ -16,7 +16,7 @@ from .use_cases import (
 
 __all__ = (
     "BaseService",
-    "ICreateTextService",
+    "IAddTextService",
     "BaseUseCase",
     "BaseCommand",
     "BaseResult",
