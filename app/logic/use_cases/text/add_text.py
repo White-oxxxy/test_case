@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+import app.infra.taskiq.tasks as tasks
 from domain.entities import Text
 from domain.mappers import TextEntityMapper
 from domain.logic.services import IAddTextService
@@ -8,7 +9,6 @@ from domain.logic import (
     BaseCommand,
     BaseResult,
 )
-from infra.taskiq.tasks import regenerate_cache_get_all_texts
 
 
 @dataclass
@@ -31,7 +31,7 @@ class AddTextUseCase(BaseUseCase):
 
         await self.text_service.act(text=text)
 
-        await regenerate_cache_get_all_texts.kiq()
+        await tasks.regenerate_cache_get_all_texts.kiq()
 
         result = AddTextResult()
 

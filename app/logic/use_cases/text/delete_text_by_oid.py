@@ -1,18 +1,18 @@
 from dataclasses import dataclass
 from uuid import UUID
 
+import app.infra.taskiq.tasks as tasks
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.logic import (
     BaseUseCase,
     BaseCommand,
     BaseResult,
 )
-from infra.taskiq.tasks import regenerate_cache_get_all_texts
 
 
 @dataclass
 class DeleteTextByOidCommand(BaseCommand):
-    text_oid: UUID
+    text_oid: str
 
 
 @dataclass
@@ -25,10 +25,10 @@ class DeleteTextByOidUseCase(BaseUseCase):
     text_repo: ITextRepositoryOrm
 
     async def act(self, command: DeleteTextByOidCommand) -> DeleteTextByOidResult:
-        await self.text_repo.delete(text_oid=command.text_oid)
+        await self.text_repo.delete(text_oid=UUID(command.text_oid))
         await self.text_repo.commit()
 
-        await regenerate_cache_get_all_texts.kiq()
+        await tasks.regenerate_cache_get_all_texts.kiq()
 
         result = DeleteTextByOidResult()
 

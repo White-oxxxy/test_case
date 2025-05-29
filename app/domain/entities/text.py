@@ -11,8 +11,8 @@ class Text(BaseEntity):
 
     def to_dict(self) -> dict[str, Any]:
         result: dict[str, Any] = {
-            "oid": self.oid,
-            "content": self.content,
+            "oid": str(self.oid),
+            "content": self.content.as_genetic_type(),
         }
         return result
 
@@ -20,5 +20,5 @@ class Text(BaseEntity):
     def from_dict(cls, data: dict[str, Any]) -> "Text":
         return cls(
             oid=data.get("oid"),
-            content=data.get("content"),
+            content=ContentValue(value=data.get("content")),
         )

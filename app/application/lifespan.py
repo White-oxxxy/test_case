@@ -2,12 +2,11 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from infra.taskiq.task_app import taskiq_broker
+from app.infra.taskiq.task_app import taskiq_broker
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
     try:
         await taskiq_broker.startup()
         yield

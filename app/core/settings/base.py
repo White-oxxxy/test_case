@@ -25,12 +25,8 @@ class RedisSettings(BaseSettings):
     user: str = Field(alias="REDIS_USER", default="REDIS_USER")
     password: str = Field(alias="REDIS_PASSWORD", default="REDIS_PASSWORD")
     host: str = Field(alias="REDIS_HOST", default="localhost")
-    port: int = Field(alias="REDIS_PORT", default=6378)
+    port: int = Field(alias="REDIS_PORT", default=6379)
     cache_life_time: int = Field(alias="CACHE_LIFE_TIME", default=600)
-
-    @property
-    def redis_url(self) -> str:
-        return rf"redis://{self.host}"
 
 
 class RmqSettings(BaseSettings):

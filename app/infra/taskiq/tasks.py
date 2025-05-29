@@ -5,7 +5,7 @@ from dishka.integrations.taskiq import (
     FromDishka,
 )
 
-from .task_app import taskiq_broker
+from app.infra.taskiq.task_app import taskiq_broker
 from core.settings.base import CommonSettings
 from domain.entities import Text
 from domain.infra.repositories import ITextRepositoryOrm

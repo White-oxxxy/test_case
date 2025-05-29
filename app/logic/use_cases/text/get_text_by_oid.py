@@ -16,7 +16,7 @@ from infra.redis.keys import TextByOid
 
 @dataclass
 class GetTextByOidCommand(BaseCommand):
-    text_oid: UUID
+    text_oid: str
     cache_exp: int
 
 
@@ -35,7 +35,7 @@ class GetTextByOidUseCase(BaseUseCase):
         cache_result: dict[str, Any] | None = await self._get_cache(key=cache_key)
 
         if not cache_result:
-            text_entity: Text = await self.text_repo.get_by_oid(required_oid=command.text_oid)
+            text_entity: Text = await self.text_repo.get_by_oid(required_oid=UUID(command.text_oid))
 
             serializable_text: dict[str, Any] = text_entity.to_dict()
 

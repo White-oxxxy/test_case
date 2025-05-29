@@ -9,7 +9,7 @@ services:
       - ../.dev.env
     ports:
       - "8000:8000"
-    command: "uvicorn application.main:create_app --host 0.0.0.0 --port 8000 --factory"
+    command: "uvicorn application.main:create_app --host 0.0.0.0 --port 8000 --factory --lifespan on"
     networks:
       - backend
 

@@ -34,7 +34,6 @@ class RedisProvider(Provider):
         redis = Redis(
             host=settings.redis.host,
             port=settings.redis.port,
-            password=settings.redis.password
         )
         return redis
 

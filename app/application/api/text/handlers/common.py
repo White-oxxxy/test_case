@@ -4,8 +4,6 @@ from dishka.integrations.fastapi import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import (
     APIRouter,
-    Depends,
-    Query,
     status,
 )
 
@@ -14,9 +12,7 @@ from application.api.text.schemas import (
     CreateTextSchema,
     DeleteTextByOidInSchema,
     GetAllTextsOutSchema,
-    GetTextsByCountInSchema,
     GetTextsByCountOutSchema,
-    GetTextsByOidInSchema,
     GetTextByOidOutSchema,
 )
 from core.settings.base import CommonSettings
@@ -87,9 +83,11 @@ async def get_all_texts_handler(
 
     texts_result: list[TextSchema] = []
     for text in use_case_result.texts:
+        content = text.content
+
         text_result = TextSchema(
-            oid=text.oid,
-            content=text.content.as_genetic_type(),
+            oid=str(text.oid),
+            content=content.as_genetic_type(),
         )
         texts_result.append(text_result)
 
@@ -99,18 +97,19 @@ async def get_all_texts_handler(
 
 
 @router.get(
-    path="/by_count",
+    path="/by_count/{count}",
     status_code=status.HTTP_200_OK,
     description="Получить n текстов",
     response_model=GetTextsByCountOutSchema,
 )
+@inject
 async def get_texts_by_count_handler(
-    schema: GetTextsByCountInSchema,
+    count: int,
     settings: FromDishka[CommonSettings],
     use_case: FromDishka[GetTextsByCountUseCase],
 ) -> GetTextsByCountOutSchema:
     command = GetTextsByCountCommand(
-        count=schema.count,
+        count=count,
         cache_exp=settings.redis.cache_life_time,
     )
 
@@ -118,9 +117,11 @@ async def get_texts_by_count_handler(
 
     texts_result: list[TextSchema] = []
     for text in use_case_result.texts:
+        content = text.content
+
         text_result = TextSchema(
-            oid=text.oid,
-            content=text.content.as_genetic_type(),
+            oid=str(text.oid),
+            content=content.as_genetic_type(),
         )
         texts_result.append(text_result)
 
@@ -135,21 +136,24 @@ async def get_texts_by_count_handler(
     description="Получить текст по oid",
     response_model=GetTextByOidOutSchema,
 )
+@inject
 async def get_text_by_oid_handler(
-    schema: GetTextsByOidInSchema,
+    text_oid: str,
     settings: FromDishka[CommonSettings],
     use_case: FromDishka[GetTextByOidUseCase],
 ) -> GetTextByOidOutSchema:
     command = GetTextByOidCommand(
-        text_oid=schema.oid,
+        text_oid=text_oid,
         cache_exp=settings.redis.cache_life_time,
     )
 
     use_case_result: GetTextByOidResult = await use_case.act(command=command)
 
+    content = use_case_result.text.content
+
     text_result = TextSchema(
-        oid=use_case_result.text.oid,
-        content=use_case_result.text.content.as_genetic_type(),
+        oid=str(use_case_result.text.oid),
+        content=content.as_genetic_type(),
     )
 
     result = GetTextByOidOutSchema(text=text_result)

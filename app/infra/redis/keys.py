@@ -20,7 +20,7 @@ class TextByCount:
 
 @dataclass(frozen=True)
 class TextByOid:
-    oid: UUID
+    oid: str
 
     @property
     def message(self) -> str:

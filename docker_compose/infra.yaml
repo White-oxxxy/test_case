@@ -34,7 +34,7 @@ services:
     image: redis:7-alpine
     container_name: redis_text
     ports:
-      - "6378:6378"
+      - "6379:6379"
     volumes:
       - redis_text:/data
     networks:
