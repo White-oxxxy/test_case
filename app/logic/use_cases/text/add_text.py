@@ -4,7 +4,7 @@ from domain.entities import Text
 from domain.mappers import TextEntityMapper
 from domain.logic.services import IAddTextService
 from domain.logic import (
-    IAddTextUseCase,
+    BaseUseCase,
     BaseCommand,
     BaseResult,
 )
@@ -22,7 +22,7 @@ class AddTextResult(BaseResult):
 
 
 @dataclass
-class AddTextUseCase(IAddTextUseCase):
+class AddTextUseCase(BaseUseCase):
     text_service: IAddTextService
     text_entity_mapper: TextEntityMapper
 

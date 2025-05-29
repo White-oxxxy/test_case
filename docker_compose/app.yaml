@@ -1,6 +1,5 @@
 services:
   text_service:
-    &text_service
     container_name: text_service
     build:
       context: ..
@@ -15,9 +14,18 @@ services:
       - backend
 
   taskiq-worker:
-    <<: *text_service
+    container_name: taskiq_worker
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    image: taskiq_worker
+    env_file:
+      - ../.dev.env
+    working_dir: /app
     ports: [ ]
-    command: [ "taskiq", "app.infra.taskiq.app:taskiq_broker", "-w", "1", "--max-fails", "1" ]
+    command: [ taskiq, worker, -fsd, app.infra.taskiq.task_app:taskiq_broker, -w, "1", --max-fails, "1"]
+    networks:
+      - backend
 
 networks:
   backend:

@@ -3,7 +3,7 @@ from uuid import UUID
 
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.logic import (
-    IDeleteTextByOidUseCase,
+    BaseUseCase,
     BaseCommand,
     BaseResult,
 )
@@ -21,7 +21,7 @@ class DeleteTextByOidResult(BaseResult):
 
 
 @dataclass
-class DeleteTextByOidUseCase(IDeleteTextByOidUseCase):
+class DeleteTextByOidUseCase(BaseUseCase):
     text_repo: ITextRepositoryOrm
 
     async def act(self, command: DeleteTextByOidCommand) -> DeleteTextByOidResult:

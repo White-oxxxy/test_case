@@ -5,22 +5,22 @@ from dishka.integrations.taskiq import (
     FromDishka,
 )
 
-from .app import taskiq_broker
+from .task_app import taskiq_broker
 from core.settings.base import CommonSettings
 from domain.entities import Text
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.infra.cache import ICacheManager
-from infra.redis.keys import TEXT_ALL
+from infra.redis.keys import TextAll
 
 
-@taskiq_broker.task(task_name="regenerate-cache-get-all-cache")
+@taskiq_broker.task(task_name="regenerate_cache_get_all_texts")
 @inject(patch_module=True)
 async def regenerate_cache_get_all_texts(
     settings: FromDishka[CommonSettings],
     text_repo: FromDishka[ITextRepositoryOrm],
     cache_manager: FromDishka[ICacheManager],
 ) -> None:
-    cache_key = TEXT_ALL
+    cache_key = TextAll().message
 
     texts: list[Text] = await text_repo.get_all()
 

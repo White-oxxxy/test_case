@@ -5,7 +5,7 @@ from domain.entities import Text
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.infra.cache import ICacheManager
 from domain.logic import (
-    IGetTextsByCountUseCase,
+    BaseUseCase,
     BaseCommand,
     BaseResult,
 )
@@ -25,7 +25,7 @@ class GetTextsByCountResult(BaseResult):
 
 
 @dataclass
-class GetTextsByCountUseCase(IGetTextsByCountUseCase):
+class GetTextsByCountUseCase(BaseUseCase):
     text_repo: ITextRepositoryOrm
     cache_manager: ICacheManager
 

@@ -5,7 +5,7 @@ from domain.entities import Text
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.infra.cache import ICacheManager
 from domain.logic import (
-    IGetAllTextsUseCase,
+    BaseUseCase,
     BaseCommand,
     BaseResult,
 )
@@ -24,7 +24,7 @@ class GetAllTextResult(BaseResult):
 
 
 @dataclass
-class GetAllTextsUseCase(IGetAllTextsUseCase):
+class GetAllTextsUseCase(BaseUseCase):
     text_repo: ITextRepositoryOrm
     cache_manager: ICacheManager
 

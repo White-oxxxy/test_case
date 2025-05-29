@@ -8,13 +8,6 @@ from domain.entities import Text
 
 
 @dataclass
-class BaseService(ABC): ...
-
-
-@dataclass
-class IAddTextService(
-    ABC,
-    BaseService,
-):
+class IAddTextService(ABC):
     @abstractmethod
     async def act(self, text: Text) -> None: ...

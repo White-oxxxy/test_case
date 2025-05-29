@@ -6,7 +6,7 @@ from domain.entities import Text
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.infra.cache import ICacheManager
 from domain.logic import (
-    IGetTextByOidUseCase,
+    BaseUseCase,
     BaseCommand,
     BaseResult,
 )
@@ -26,7 +26,7 @@ class GetTextByOidResult(BaseResult):
 
 
 @dataclass
-class GetTextByOidUseCase(IGetTextByOidUseCase):
+class GetTextByOidUseCase(BaseUseCase):
     text_repo: ITextRepositoryOrm
     cache_manager: ICacheManager
 

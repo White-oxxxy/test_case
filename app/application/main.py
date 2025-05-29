@@ -1,7 +1,12 @@
 from fastapi import FastAPI
+from dishka.integrations import fastapi as fastapi_integration
+from dishka.integrations import taskiq as taskiq_integration
 
 from application.lifespan import lifespan
-from application.api.v1.handlers import router as text_router
+from application.api.text.handlers import router as text_router
+from application.api.text.handlers import setup_exception_handler
+from di import container
+from infra.taskiq.task_app import taskiq_broker
 
 
 def create_app() -> FastAPI:
@@ -14,5 +19,9 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
     app.include_router(router=text_router)
+    setup_exception_handler(app=app)
+
+    fastapi_integration.setup_dishka(container=container, app=app)
+    taskiq_integration.setup_dishka(container=container, broker=taskiq_broker)
 
     return app
