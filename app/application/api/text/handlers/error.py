@@ -9,6 +9,10 @@ from infra.pg.repositories.exceptions.text import (
     TextAlreadyExistException,
     TextDoesntExistException,
 )
+from infra.redis.exceptions import (
+    CacheDecodeException,
+    CacheEncodeException,
+)
 
 
 def setup_exception_handler(app: FastAPI) -> None:
@@ -52,6 +56,30 @@ def setup_exception_handler(app: FastAPI) -> None:
         response: JSONResponse = _build_response(
             detail=exc.message,
             status_code=404
+        )
+
+        return response
+
+    @app.exception_handler(CacheDecodeException)
+    async def handel_cache_decode_exception(
+        request: Request,
+        exc: CacheDecodeException,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail=exc.message,
+            status_code=400,
+        )
+
+        return response
+
+    @app.exception_handler(CacheEncodeException)
+    async def handel_cache_encode_exception(
+        request: Request,
+        exc: CacheEncodeException,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail=exc.message,
+            status_code=500,
         )
 
         return response
