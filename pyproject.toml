@@ -21,6 +21,12 @@ dependencies = [
     "taskiq-redis (>=1.0.8,<2.0.0)",
     "taskiq-fastapi (>=0.3.5,<0.4.0)",
     "alembic (>=1.16.1,<2.0.0)",
+    "opentelemetry-api (>=1.33.1,<2.0.0)",
+    "opentelemetry-sdk (>=1.33.1,<2.0.0)",
+    "opentelemetry-exporter-prometheus (>=0.54b1,<0.55)",
+    "prometheus-client (>=0.22.0,<0.23.0)",
+    "opentelemetry-instrumentation-fastapi (>=0.54b1,<0.55)",
+    "opentelemetry-exporter-otlp (>=1.33.1,<2.0.0)",
 ]
 
 

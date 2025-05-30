@@ -7,6 +7,7 @@ from core.settings.base import (
     PostgresSettings,
     RedisSettings,
     RmqSettings,
+    OtlpSettings,
 )
 
 
@@ -18,6 +19,7 @@ class ProdSettings(CommonSettings):
         data["pg"] = PostgresSettings.model_validate(env_data)
         data["redis"] = RedisSettings.model_validate(env_data)
         data["rmq"] = RmqSettings.model_validate(env_data)
+        data["otlp"] = OtlpSettings.model_validate(env_data)
 
         super().__init__(**data)
 

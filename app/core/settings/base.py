@@ -42,8 +42,19 @@ class RmqSettings(BaseSettings):
         return rf"amqp://{self.username}:{self.password}@{self.host}:{self.port}/"
 
 
+class OtlpSettings(BaseSettings):
+    model_config = SettingsConfigDict(extra="allow")
+
+    host: str = Field(alias="OTLP_HOST", default="localhost")
+    port: int = Field(alias="OTLP_PORT", default="4317")
+
+    @property
+    def otlp_url(self) -> str:
+        return rf"http://{self.host}:{self.port}"
+
 
 class CommonSettings(BaseSettings):
     pg: PostgresSettings
     redis: RedisSettings
     rmq: RmqSettings
+    otlp: OtlpSettings

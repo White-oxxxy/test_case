@@ -4,6 +4,7 @@ LOGS = docker logs
 ENV = --env-file .dev.env
 APP = docker_compose/app.yaml
 INFRA = docker_compose/infra.yaml
+MONITORING = docker_compose/monitoring.yaml
 
 .PHONY: app
 app:
@@ -19,4 +20,12 @@ infra:
 
 .PHONY: infra-down
 infra-down:
-    ${DC} -f ${INFRA} $ENV down
+    ${DC} -f ${INFRA} ${ENV} down
+
+.PHONY: monitoring
+monitoring:
+    ${DC} -f ${MONITORING} ${ENV} up --build -d
+
+.PHONY: monitoring-down
+monitoring-down:
+    ${DC} -f ${MONITORING} ${ENV} down

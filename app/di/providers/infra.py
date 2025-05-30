@@ -23,6 +23,22 @@ from infra.redis import CacheManager
 from infra.pg.dao import TextDao
 from infra.pg.repositories import TextRepositoryOrm
 from infra.pg.mappers import TextOrmToTextDomainMapper
+from infra.metrics.custom_metrics import (
+    db_query_duration,
+    db_success_counter,
+    db_error_counter,
+    cache_duration,
+    cache_success_counter,
+    cache_error_counter,
+)
+from infra.metrics.proxies import (
+    DaoType,
+    CacheManagerType,
+)
+from infra.metrics.fabrics import (
+    wrap_dao_with_metrics,
+    wrap_cache_manager_with_metrics,
+)
 
 
 class RedisProvider(Provider):
@@ -74,8 +90,28 @@ class DaosProvider(Provider):
         self,
         session: AsyncSession,
     ) -> ITextDao:
+        dao_name = "text_dao"
+
         dao = TextDao(session=session)
-        return dao
+
+        proxy: ITextDao = self._wrap(
+            dao=dao,
+            name=dao_name,
+        )
+
+        return proxy
+
+    @staticmethod
+    def _wrap(dao: DaoType, name: str) -> DaoType:
+        wrapped_dao: DaoType = wrap_dao_with_metrics(
+            dao=dao,
+            name=name,
+            duration=db_query_duration,
+            success_counter=db_success_counter,
+            error_counter=db_error_counter,
+        )
+
+        return wrapped_dao
 
 
 class RepositoriesProvider(Provider):
@@ -100,5 +136,25 @@ class CacheManagerProvider(Provider):
         self,
         redis: Redis,
     ) -> ICacheManager:
+        manager_name = "redis_manager"
+
         manager = CacheManager(redis=redis)
-        return manager
+
+        proxy: ICacheManager = self._wrap(
+            manager=manager,
+            name=manager_name,
+        )
+
+        return proxy
+
+    @staticmethod
+    def _wrap(manager: CacheManagerType, name: str) -> CacheManagerType:
+        wrapped_manager: CacheManagerType = wrap_cache_manager_with_metrics(
+            cache_manager=manager,
+            name=name,
+            duration=cache_duration,
+            success_counter=cache_success_counter,
+            error_counter=cache_error_counter
+        )
+
+        return wrapped_manager
