@@ -8,6 +8,8 @@ from opentelemetry.sdk.metrics import (
 from .proxies import (
     UseCaseWithMetricsProxy,
     UseCaseType,
+    ServiceWithMetricsProxy,
+    ServiceType,
     DaoWithMetricsProxy,
     DaoType,
     CacheManagerWithMetricsProxy,
@@ -33,6 +35,26 @@ def wrap_use_case_with_metrics(
     ))
 
     return wrapped_use_case
+
+
+def wrap_service_with_metrics(
+    service: ServiceType,
+    name: str,
+    duration: Histogram,
+    counter: Counter,
+    success_counter: Counter,
+    error_counter: Counter,
+) -> ServiceType:
+    wrapped_service: ServiceType = cast(ServiceType, ServiceWithMetricsProxy(
+        service=service,
+        name=name,
+        duration=duration,
+        counter=counter,
+        success_counter=success_counter,
+        error_counter=error_counter,
+    ))
+
+    return wrapped_service
 
 
 def wrap_dao_with_metrics(

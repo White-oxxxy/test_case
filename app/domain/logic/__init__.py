@@ -1,4 +1,7 @@
-from .services import IAddTextService
+from .services import (
+    BaseService,
+    IAddTextService,
+)
 from .use_cases import (
     BaseUseCase,
     BaseCommand,
@@ -7,6 +10,7 @@ from .use_cases import (
 
 
 __all__ = (
+    "BaseService",
     "IAddTextService",
     "BaseUseCase",
     "BaseCommand",

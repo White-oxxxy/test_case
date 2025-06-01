@@ -23,7 +23,7 @@ from infra.redis import CacheManager
 from infra.pg.dao import TextDao
 from infra.pg.repositories import TextRepositoryOrm
 from infra.pg.mappers import TextOrmToTextDomainMapper
-from infra.metrics.custom_metrics import (
+from infra.monitoring.metrics.custom_metrics import (
     db_query_duration,
     db_success_counter,
     db_error_counter,
@@ -31,11 +31,11 @@ from infra.metrics.custom_metrics import (
     cache_success_counter,
     cache_error_counter,
 )
-from infra.metrics.proxies import (
+from infra.monitoring.proxies import (
     DaoType,
     CacheManagerType,
 )
-from infra.metrics.fabrics import (
+from infra.monitoring.fabrics import (
     wrap_dao_with_metrics,
     wrap_cache_manager_with_metrics,
 )

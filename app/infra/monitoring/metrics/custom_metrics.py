@@ -1,4 +1,4 @@
-from app.infra.metrics.prometheus_app import meter
+from infra.monitoring.metrics.metrics_exporter import meter
 
 
 # --- Database ---
@@ -58,6 +58,29 @@ task_success_counter = meter.create_counter(
 task_error_counter = meter.create_counter(
     name="task_errors_total",
     description="Количество ошибочных выполнений задач",
+)
+
+# --- Services ---
+
+service_duration = meter.create_histogram(
+    name="service_duration_seconds",
+    unit="s",
+    description="Время выполнения сервиса"
+)
+
+service_counter = meter.create_counter(
+    name="service_invocations_total",
+    description="Количество вызовов сервиса",
+)
+
+service_success_counter = meter.create_counter(
+    name="service_success_total",
+    description="Количество успешных выполнений сервиса",
+)
+
+service_error_counter = meter.create_counter(
+    name="service_errors_total",
+    description="Количество ошибочных выполнений сервиса",
 )
 
 # --- UseCases ---
