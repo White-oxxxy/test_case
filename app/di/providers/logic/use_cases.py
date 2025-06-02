@@ -8,14 +8,14 @@ from domain.mappers import TextEntityMapper
 from domain.infra.repositories import ITextRepositoryOrm
 from domain.infra.cache import ICacheManager
 from domain.logic.services import IAddTextService
-from infra.metrics.custom_metrics import (
+from infra.monitoring.metrics.custom_metrics import (
     use_case_duration,
     use_case_counter,
     use_case_success_counter,
     use_case_error_counter,
 )
-from infra.metrics.proxies import UseCaseType
-from infra.metrics.fabrics import wrap_use_case_with_metrics
+from infra.monitoring.proxies import UseCaseType
+from infra.monitoring.fabrics import wrap_use_case_with_metrics
 from logic.use_cases import (
     AddTextUseCase,
     DeleteTextByOidUseCase,

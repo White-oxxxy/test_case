@@ -10,6 +10,20 @@ services:
     networks:
       - backend
 
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./monitoring/tempo/tempo.yaml:/etc/tempo.yaml
+      - tempo_data:/var/tmp/tempo_data
+    ports:
+      - "3200:3200"  # Tempo HTTP
+      - "5317:4317"  # OTLP gRPC
+      - "5318:4318"  # OTLP HTTP
+    networks:
+      - backend
+
   grafana:
     image: grafana/grafana:latest
     container_name: grafana
@@ -43,6 +57,7 @@ services:
 
 volumes:
   grafana_data:
+  tempo_data:
 
 networks:
   backend:

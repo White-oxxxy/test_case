@@ -1,6 +1,7 @@
-from fastapi import FastAPI
 from dishka.integrations import fastapi as fastapi_integration
 from dishka.integrations import taskiq as taskiq_integration
+from fastapi import FastAPI
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from application.lifespan import lifespan
 from application.api.text.handlers import router as text_router
@@ -22,6 +23,8 @@ def create_app() -> FastAPI:
     app.include_router(router=text_router)
 
     setup_middlewares(app=app)
+
+    FastAPIInstrumentor.instrument_app(app=app)
 
     setup_exception_handler(app=app)
 
