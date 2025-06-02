@@ -7,11 +7,12 @@ from typing import (
 )
 
 
-MT = TypeVar("MT", bound=Any)
+ModelType = TypeVar("ModelType", bound=Any)
+SessionType = TypeVar("SessionType", bound=Any)
 
 
 @dataclass
 class IBaseDao(
     ABC,
-    Generic[MT]
+    Generic[ModelType, SessionType]
 ): ...

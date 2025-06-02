@@ -3,11 +3,19 @@ from abc import (
     abstractmethod,
 )
 from dataclasses import dataclass
-from typing import Any
+from typing import (
+    Any,
+    Generic,
+)
+
+from domain.infra.daos import SessionType
 
 
 @dataclass
-class IBaseRepositoryOrm(ABC):
+class IBaseRepositoryOrm(
+    Generic[SessionType],
+    ABC,
+):
     @abstractmethod
     async def commit(self) -> None: ...
 

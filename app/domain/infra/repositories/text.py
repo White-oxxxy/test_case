@@ -7,11 +7,30 @@ from uuid import UUID
 
 from .base import IBaseRepositoryOrm
 from domain.entities import Text
+from domain.infra.daos import SessionType
 
 
 @dataclass
-class ITextRepositoryOrm(
-    IBaseRepositoryOrm,
+class ITextWriteRepositoryOrm(
+    IBaseRepositoryOrm[SessionType],
+    ABC,
+):
+    @abstractmethod
+    async def create(
+            self,
+            text: Text,
+    ) -> None: ...
+
+    @abstractmethod
+    async def delete(
+            self,
+            text_oid: UUID,
+    ) -> None: ...
+
+
+@dataclass
+class ITextReadRepositoryOrm(
+    IBaseRepositoryOrm[SessionType],
     ABC,
 ):
     @abstractmethod
@@ -28,15 +47,3 @@ class ITextRepositoryOrm(
 
     @abstractmethod
     async def get_all(self) -> list[Text]: ...
-
-    @abstractmethod
-    async def create(
-        self,
-        text: Text,
-    ) -> None: ...
-
-    @abstractmethod
-    async def delete(
-        self,
-        text_oid: UUID,
-    ) -> None: ...

@@ -1,32 +1,94 @@
 services:
-  postgres_text:
+  postgres_master_text:
     image: postgres:16-alpine
-    container_name: pg_text
+    container_name: pg-master-text
+    ports:
+      - "45432:5432"
     env_file:
       - ../.dev.env
     environment:
       POSTGRES_DB: $POSTGRES_DB
       POSTGRES_USER: $POSTGRES_USER
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-    ports:
-      - "45432:5432"
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - pgdata_text:/var/lib/postgresql/data
+      - master_text_data:/var/lib/postgresql/data
+      - ./master-init:/docker-entrypoint-initdb.d
+      - ./master-init/pg_hba.conf:/var/lib/postgresql/data/pg_hba.conf
+    command:
+      - "postgres"
+      - "-c"
+      - "wal_level=replica"
+      - "-c"
+      - "max_wal_senders=10"
+      - "-c"
+      - "wal_keep_size=64"
+      - "-c"
+      - "hot_standby=on"
+    networks:
+      - backend
+
+  postgres_slave_text:
+    image: postgres:16-alpine
+    container_name: pg-slave-text
+    depends_on:
+      - postgres-master-text
+    env_file:
+      - ../.dev.env
+    environment:
+      POSTGRES_DB: $POSTGRES_DB
+      POSTGRES_USER: $POSTGRES_USER
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    volumes:
+      - slave_text_data:/var/lib/postgresql/data
+    entrypoint:
+      - "sh"
+      - "-c"
+      - |
+        until pg_isready -h pg-master-text -U $POSTGRES_USER; do sleep 1; done;
+        rm -rf /var/lib/postgresql/data/*
+        PGPASSWORD=$POSTGRES_PASSWORD pg_basebackup -h pg-master-text -D /var/lib/postgresql/data -U $POSTGRES_USER -Fp -Xs -P -R
+        exec docker-entrypoint.sh postgres
+    command:
+      - "-c"
+      - "hot_standby=on"
+      - "-c"
+      - "primary_conninfo=host=pg-master-text port=5432 user=$POSTGRES_USER password=$POSTGRES_PASSWORD"
     networks:
       - backend
 
   pgadmin_text:
     image: dpage/pgadmin4:latest
     container_name: pgadmin_text
+    env_file:
+      - ../.dev.env
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_DEFAULT_EMAIL: $PGADMIN_EMAIL
+      PGADMIN_DEFAULT_PASSWORD: $PGADMIN_PASSWORD
     ports:
       - "8080:80"
     depends_on:
-      - postgres_text
+      - postgres-master-text
+      - postgres-slave-text
+    networks:
+      - backend
+
+  pgbouncer:
+    image: edoburu/pgbouncer
+    container_name: pgbouncer
+    ports:
+      - "6432:6432"
+    env_file:
+      - ../.dev.env
     volumes:
-      - pgadmin_text:/var/lib/pgadmin
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt
+    environment:
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - postgres-master-text
+      - postgres-slave-text
     networks:
       - backend
 

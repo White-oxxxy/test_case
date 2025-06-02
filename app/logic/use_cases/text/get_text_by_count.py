@@ -2,13 +2,14 @@ from dataclasses import dataclass
 from typing import Any
 
 from domain.entities import Text
-from domain.infra.repositories import ITextRepositoryOrm
+from domain.infra.repositories import ITextReadRepositoryOrm
 from domain.infra.cache import ICacheManager
 from domain.logic import (
     BaseUseCase,
     BaseCommand,
     BaseResult,
 )
+from infra.pg.dao import Session
 from infra.redis.keys import TextByCount
 from infra.redis.exceptions import ValueDoesntExistException
 
@@ -26,7 +27,7 @@ class GetTextsByCountResult(BaseResult):
 
 @dataclass
 class GetTextsByCountUseCase(BaseUseCase):
-    text_repo: ITextRepositoryOrm
+    text_repo: ITextReadRepositoryOrm[Session]
     cache_manager: ICacheManager
 
     async def act(self, command: GetTextsByCountCommand) -> GetTextsByCountResult:

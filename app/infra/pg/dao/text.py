@@ -7,15 +7,57 @@ from sqlalchemy import (
     select,
 )
 
-from .base import BaseDao
-from domain.infra.daos import ITextDao
+from .base import (
+    BaseDao,
+    Session,
+)
+from domain.infra.daos import (
+    ITextReadDao,
+    ITextWriteDao,
+)
 from infra.pg.models import TextOrm
 
 
 @dataclass
-class TextDao(
-    BaseDao[TextOrm],
-    ITextDao[TextOrm],
+class TextWriteDao(
+    BaseDao[TextOrm, Session],
+    ITextWriteDao[TextOrm, Session],
+
+):
+    async def create(
+        self,
+        oid: UUID,
+        content: str,
+    ) -> None:
+        text = TextOrm(
+            oid=oid,
+            content=content,
+        )
+
+        self.session.add(text)
+
+    async def delete(
+        self,
+        text_oid: UUID,
+    ) -> TextOrm | None:
+        stmt: Select[tuple["TextOrm"]] = (
+            select(TextOrm)
+            .where(TextOrm.oid == text_oid)
+        )
+        result: Result[tuple["TextOrm"]] = await self.session.execute(stmt)
+        text: TextOrm = result.scalar_one_or_none()
+        if not text:
+            return None
+
+        await self.session.delete(text)
+
+        return text
+
+
+@dataclass
+class TextReadDao(
+    BaseDao[TextOrm, Session],
+    ITextReadDao[TextOrm, Session],
 ):
     async def get_by_oid(
         self,
@@ -47,32 +89,3 @@ class TextDao(
         texts: list["TextOrm"] = list(result.scalars().all())
 
         return texts
-
-    async def create(
-        self,
-        oid: UUID,
-        content: str,
-    ) -> None:
-        text = TextOrm(
-            oid=oid,
-            content=content,
-        )
-
-        self.session.add(text)
-
-    async def delete(
-        self,
-        text_oid: UUID,
-    ) -> TextOrm | None:
-        stmt: Select[tuple["TextOrm"]] = (
-            select(TextOrm)
-            .where(TextOrm.oid == text_oid)
-        )
-        result: Result[tuple["TextOrm"]] = await self.session.execute(stmt)
-        text: TextOrm = result.scalar_one_or_none()
-        if not text:
-            return None
-
-        await self.session.delete(text)
-
-        return text

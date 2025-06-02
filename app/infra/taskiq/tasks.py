@@ -8,8 +8,9 @@ from dishka.integrations.taskiq import (
 from app.infra.taskiq.task_app import taskiq_broker
 from core.settings.base import CommonSettings
 from domain.entities import Text
-from domain.infra.repositories import ITextRepositoryOrm
+from domain.infra.repositories import ITextReadRepositoryOrm
 from domain.infra.cache import ICacheManager
+from infra.pg.dao import Session
 from infra.redis.keys import TextAll
 
 
@@ -17,7 +18,7 @@ from infra.redis.keys import TextAll
 @inject(patch_module=True)
 async def regenerate_cache_get_all_texts(
     settings: FromDishka[CommonSettings],
-    text_repo: FromDishka[ITextRepositoryOrm],
+    text_repo: FromDishka[ITextReadRepositoryOrm[Session]],
     cache_manager: FromDishka[ICacheManager],
 ) -> None:
     cache_key = TextAll().message

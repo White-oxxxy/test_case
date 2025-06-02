@@ -8,15 +8,19 @@ from pydantic import Field
 class PostgresSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="allow")
 
-    name: str = Field(alias="POSTGRES_NAME", default="POSTGRES_NAME")
+    name: str = Field(alias="POSTGRES_DB", default="POSTGRES_DB")
     user: str = Field(alias="POSTGRES_USER", default="POSTGRES_USER")
     password: str = Field(alias="POSTGRES_PASSWORD", default="POSTGRES_PASSWORD")
-    host: str = Field(alias="POSTGRES_HOST", default="POSTGRES_HOST")
-    port: str = Field(alias="POSTGRES_PORT", default="POSTGRES_PORT")
+    pgbouncer_host: str = Field(alias="PGBOUNCER_HOST", default="pgbouncer")
+    pgbouncer_port: int = Field(alias="PGBOUNCER_PORT", default=6432)
 
     @property
-    def postgres_url(self) -> str:
-        return rf"postgresql+asyncpg://{self.user}:{self.password}@{self.host}:{self.port}/{self.name}"
+    def write_database_url(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.pgbouncer_host}:{self.pgbouncer_port}/write_db"
+
+    @property
+    def read_database_url(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password}@{self.pgbouncer_host}:{self.pgbouncer_port}/read_db"
 
 
 class RedisSettings(BaseSettings):
@@ -26,7 +30,7 @@ class RedisSettings(BaseSettings):
     password: str = Field(alias="REDIS_PASSWORD", default="REDIS_PASSWORD")
     host: str = Field(alias="REDIS_HOST", default="localhost")
     port: int = Field(alias="REDIS_PORT", default=6379)
-    cache_life_time: int = Field(alias="CACHE_LIFE_TIME", default=600)
+    cache_life_time: int = Field(alias="REDIS_CACHE_LIFE_TIME", default=600)
 
 
 class RmqSettings(BaseSettings):

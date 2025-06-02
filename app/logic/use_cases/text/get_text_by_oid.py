@@ -3,13 +3,14 @@ from typing import Any
 from uuid import UUID
 
 from domain.entities import Text
-from domain.infra.repositories import ITextRepositoryOrm
+from domain.infra.repositories import ITextReadRepositoryOrm
 from domain.infra.cache import ICacheManager
 from domain.logic import (
     BaseUseCase,
     BaseCommand,
     BaseResult,
 )
+from infra.pg.dao import Session
 from infra.redis.exceptions import ValueDoesntExistException
 from infra.redis.keys import TextByOid
 
@@ -27,7 +28,7 @@ class GetTextByOidResult(BaseResult):
 
 @dataclass
 class GetTextByOidUseCase(BaseUseCase):
-    text_repo: ITextRepositoryOrm
+    text_repo: ITextReadRepositoryOrm[Session]
     cache_manager: ICacheManager
 
     async def act(self, command: GetTextByOidCommand) -> GetTextByOidResult:

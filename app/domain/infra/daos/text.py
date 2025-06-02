@@ -7,39 +7,46 @@ from uuid import UUID
 
 from .base import (
     IBaseDao,
-    MT,
+    ModelType,
+    SessionType,
 )
 
 
 @dataclass
-class ITextDao(
-    IBaseDao[MT],
+class ITextWriteDao(
+    IBaseDao[ModelType, SessionType],
+    ABC,
+):
+    @abstractmethod
+    async def create(
+            self,
+            oid: UUID,
+            content: str,
+    ) -> None: ...
+
+    @abstractmethod
+    async def delete(
+            self,
+            text_oid: UUID,
+    ) -> ModelType | None: ...
+
+
+@dataclass
+class ITextReadDao(
+    IBaseDao[ModelType, SessionType],
     ABC,
 ):
     @abstractmethod
     async def get_by_oid(
         self,
         required_oid: UUID
-    ) -> MT | None: ...
+    ) -> ModelType | None: ...
 
     @abstractmethod
     async def get_last_n_texts(
         self,
         count: int,
-    ) -> list[MT]: ...
+    ) -> list[ModelType]: ...
 
     @abstractmethod
-    async def get_all(self) -> list[MT]: ...
-
-    @abstractmethod
-    async def create(
-        self,
-        oid: UUID,
-        content: str,
-    ) -> None: ...
-
-    @abstractmethod
-    async def delete(
-        self,
-        text_oid: UUID,
-    ) -> MT | None: ...
+    async def get_all(self) -> list[ModelType]: ...

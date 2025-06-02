@@ -1,14 +1,17 @@
 from dataclasses import dataclass
-
-from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Generic
 
 from domain.infra.repositories import IBaseRepositoryOrm
+from infra.pg.dao import Session
 from infra.pg.models import BaseOrm
 
 
 @dataclass
-class BaseRepositoryOrm(IBaseRepositoryOrm):
-    session: AsyncSession
+class BaseRepositoryOrm(
+    Generic[Session],
+    IBaseRepositoryOrm[Session],
+):
+    session: Session
 
     async def commit(self) -> None:
         await self.session.commit()

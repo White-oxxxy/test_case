@@ -11,12 +11,13 @@ from infra.pg.models import BaseOrm
 
 
 Model = TypeVar("Model", bound=BaseOrm)
+Session = TypeVar("Session", bound=AsyncSession)
 
 
 @dataclass
 class BaseDao(
-    Generic[Model],
-    IBaseDao[Model]
+    Generic[Model, Session],
+    IBaseDao[Model, Session]
 ):
-    session: AsyncSession
+    session: Session
 

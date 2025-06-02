@@ -1,8 +1,12 @@
 from .base import IBaseRepositoryOrm
-from .text import ITextRepositoryOrm
+from .text import (
+    ITextWriteRepositoryOrm,
+    ITextReadRepositoryOrm,
+)
 
 
 __all__ = (
     "IBaseRepositoryOrm",
-    "ITextRepositoryOrm",
+    "ITextWriteRepositoryOrm",
+    "ITextReadRepositoryOrm",
 )

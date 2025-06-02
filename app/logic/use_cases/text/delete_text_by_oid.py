@@ -2,12 +2,13 @@ from dataclasses import dataclass
 from uuid import UUID
 
 import app.infra.taskiq.tasks as tasks
-from domain.infra.repositories import ITextRepositoryOrm
+from domain.infra.repositories import ITextWriteRepositoryOrm
 from domain.logic import (
     BaseUseCase,
     BaseCommand,
     BaseResult,
 )
+from infra.pg.dao import Session
 
 
 @dataclass
@@ -22,7 +23,7 @@ class DeleteTextByOidResult(BaseResult):
 
 @dataclass
 class DeleteTextByOidUseCase(BaseUseCase):
-    text_repo: ITextRepositoryOrm
+    text_repo: ITextWriteRepositoryOrm[Session]
 
     async def act(self, command: DeleteTextByOidCommand) -> DeleteTextByOidResult:
         await self.text_repo.delete(text_oid=UUID(command.text_oid))
