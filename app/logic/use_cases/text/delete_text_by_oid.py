@@ -8,6 +8,7 @@ from domain.logic import (
     BaseResult,
 )
 from infra.pg.dao import Session
+from infra.monitoring.instruments.decorators import with_trace_carrier
 
 
 @dataclass
@@ -24,14 +25,20 @@ class DeleteTextByOidResult(BaseResult):
 class DeleteTextByOidUseCase(BaseUseCase):
     text_repo: ITextWriteRepositoryOrm[Session]
 
-    async def act(self, command: DeleteTextByOidCommand) -> DeleteTextByOidResult:
+
+    @with_trace_carrier
+    async def act(
+            self,
+            command: DeleteTextByOidCommand,
+            trace_carrier: dict[str, str] = None,
+    ) -> DeleteTextByOidResult:
         await self.text_repo.delete(text_oid=UUID(command.text_oid))
 
         await self.text_repo.commit()
 
         from infra.taskiq.tasks import regenerate_cache_get_all_texts
 
-        await regenerate_cache_get_all_texts.kiq()
+        await regenerate_cache_get_all_texts.kiq(trace_carrier=trace_carrier)
 
         result = DeleteTextByOidResult()
 

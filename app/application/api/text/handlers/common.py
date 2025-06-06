@@ -8,7 +8,7 @@ from fastapi import (
 from application.api.text.schemas import (
     TextSchema,
     CreateTextSchema,
-    DeleteTextByOidInSchema,
+    CreateTextOutSchema,
     GetAllTextsOutSchema,
     GetTextsByCountOutSchema,
     GetTextByOidOutSchema,
@@ -17,6 +17,7 @@ from core.settings.base import CommonSettings
 from logic.use_cases import (
     AddTextUseCase,
     AddTextCommand,
+    AddTextResult,
     DeleteTextByOidUseCase,
     DeleteTextByOidCommand,
     GetAllTextsUseCase,
@@ -38,15 +39,28 @@ router = APIRouter(prefix="/text")
     path="/new",
     status_code=status.HTTP_201_CREATED,
     description="Создание нового текста",
+    response_model=CreateTextOutSchema
 )
 @inject
 async def add_text_handler(
     schema: CreateTextSchema,
     use_case: FromDishka[AddTextUseCase],
-) -> None:
+) -> CreateTextOutSchema:
     command = AddTextCommand(content=schema.content)
 
-    await use_case.act(command=command)
+    use_case_result: AddTextResult = await use_case.act(command=command)
+
+    text_result = TextSchema(
+        oid=str(use_case_result.text.oid),
+        content=use_case_result.text.content.as_genetic_type(),
+    )
+
+    result = CreateTextOutSchema(
+        message="Текст успешно добавлен!",
+        text=text_result,
+    )
+
+    return result
 
 
 @router.delete(
@@ -56,10 +70,10 @@ async def add_text_handler(
 )
 @inject
 async def delete_text_by_oid_handler(
-    schema: DeleteTextByOidInSchema,
+    text_oid: str,
     use_case: FromDishka[DeleteTextByOidUseCase],
 ) -> None:
-    command = DeleteTextByOidCommand(text_oid=schema.oid)
+    command = DeleteTextByOidCommand(text_oid=text_oid)
 
     await use_case.act(command=command)
 

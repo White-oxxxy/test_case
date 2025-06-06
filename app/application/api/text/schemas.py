@@ -10,6 +10,11 @@ class CreateTextSchema(BaseModel):
     content: str
 
 
+class CreateTextOutSchema(BaseModel):
+    message: str
+    text: TextSchema
+
+
 class GetAllTextsOutSchema(BaseModel):
     texts: list[TextSchema]
 
@@ -20,10 +25,6 @@ class GetTextByOidOutSchema(BaseModel):
 
 class GetTextsByCountOutSchema(BaseModel):
     texts: list[TextSchema]
-
-
-class DeleteTextByOidInSchema(BaseModel):
-    oid: str
 
 
 class HealthCheckOutSchema(BaseModel):

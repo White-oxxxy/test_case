@@ -18,7 +18,7 @@ class AddTextCommand(BaseCommand):
 
 @dataclass
 class AddTextResult(BaseResult):
-    pass
+    text: Text
 
 
 @dataclass
@@ -40,6 +40,6 @@ class AddTextUseCase(BaseUseCase):
 
         await regenerate_cache_get_all_texts.kiq(trace_carrier=trace_carrier)
 
-        result = AddTextResult()
+        result = AddTextResult(text=text)
 
         return result
