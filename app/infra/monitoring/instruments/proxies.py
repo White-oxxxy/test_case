@@ -5,6 +5,7 @@ from typing import (
     Generic,
 )
 
+from opentelemetry import trace
 from opentelemetry.trace import SpanKind
 from opentelemetry.sdk.metrics import (
     Histogram,
@@ -12,7 +13,7 @@ from opentelemetry.sdk.metrics import (
 )
 
 from domain.infra.daos import IBaseDao
-from domain.infra.cache import ICacheManager
+from domain.infra.cache import IBaseCacheManager
 from domain.logic.services import BaseService
 from domain.logic.use_cases import BaseUseCase
 from infra.monitoring.traces_exporter import tracer
@@ -34,11 +35,21 @@ class DaoWithMetricsProxy(Generic[DaoType]):
 
         if callable(orig_attr):
             async def wrapper(*args, **kwargs):
-                async with tracer.start_as_current_span(name=f"dao:{self.name}", kind=SpanKind.INTERNAL):
-                    start = time.perf_counter()
+                start = time.perf_counter()
 
-                    labels = {"dao": self.name, "method": attr}
+                labels = {
+                    "dao": self.name,
+                    "method": attr,
+                }
 
+                parent_span = trace.get_current_span()
+                context = trace.set_span_in_context(parent_span)
+
+                with tracer.start_as_current_span(
+                    name=f"dao:{self.name}",
+                    kind=SpanKind.INTERNAL,
+                    context=context,
+                ):
                     try:
                         result = await orig_attr(*args, **kwargs)
 
@@ -58,11 +69,10 @@ class DaoWithMetricsProxy(Generic[DaoType]):
             return wrapper
 
         else:
-
             return orig_attr
 
 
-CacheManagerType = TypeVar("CacheManagerType", bound=ICacheManager)
+CacheManagerType = TypeVar("CacheManagerType", bound=IBaseCacheManager)
 
 
 @dataclass
@@ -76,15 +86,25 @@ class CacheManagerWithMetricsProxy(Generic[CacheManagerType]):
     def __getattr__(self, attr):
         orig_attr = getattr(self.cache_manager, attr)
 
-        if callable(attr):
+        if callable(orig_attr):
             async def wrapper(*args, **kwargs):
-                async with tracer.start_as_current_span(name=f"cache_manager:{self.name}", kind=SpanKind.INTERNAL):
-                    start = time.perf_counter()
+                start = time.perf_counter()
 
-                    labels = {"cache_manager": self.name, "method": attr}
+                labels = {
+                    "cache_manager": self.name,
+                    "method": attr,
+                }
 
+                parent_span = trace.get_current_span()
+                context = trace.set_span_in_context(parent_span)
+
+                with tracer.start_as_current_span(
+                    name=f"cache_manager:{self.name}",
+                    kind=SpanKind.INTERNAL,
+                    context=context,
+                ):
                     try:
-                        result = await attr(*args, **kwargs)
+                        result = await orig_attr(*args, **kwargs)
 
                         self.success_counter.add(1, labels)
 
@@ -102,7 +122,8 @@ class CacheManagerWithMetricsProxy(Generic[CacheManagerType]):
 
             return wrapper
 
-        return orig_attr
+        else:
+            return orig_attr
 
 
 ServiceType = TypeVar("ServiceType", bound=BaseService)
@@ -120,15 +141,25 @@ class ServiceWithMetricsProxy(Generic[ServiceType]):
     def __getattr__(self, attr):
         orig_attr = getattr(self.service, attr)
 
-        if callable(attr):
+        if callable(orig_attr):
             async def wrapper(*args, **kwargs):
-                async with tracer.start_as_current_span(name=f"service:{self.name}", kind=SpanKind.INTERNAL):
-                    start = time.perf_counter()
+                start = time.perf_counter()
 
-                    labels = {"service": self.name, "method": attr}
+                labels = {
+                    "service": self.name,
+                    "method": attr,
+                }
 
+                parent_span = trace.get_current_span()
+                context = trace.set_span_in_context(parent_span)
+
+                with tracer.start_as_current_span(
+                    name=f"service:{self.name}",
+                    kind=SpanKind.INTERNAL,
+                    context=context,
+                ):
                     try:
-                        result = await attr(*args, **kwargs)
+                        result = await orig_attr(*args, **kwargs)
 
                         self.success_counter.add(1, labels)
 
@@ -165,15 +196,25 @@ class UseCaseWithMetricsProxy(Generic[UseCaseType]):
     def __getattr__(self, attr):
         orig_attr = getattr(self.use_case, attr)
 
-        if callable(attr):
+        if callable(orig_attr):
             async def wrapper(*args, **kwargs):
-                async with tracer.start_as_current_span(name=f"use_case:{self.name}", kind=SpanKind.INTERNAL):
-                    start = time.perf_counter()
+                start = time.perf_counter()
 
-                    labels = {"use_case": self.name, "method": attr}
+                labels = {
+                    "use_case": self.name,
+                    "method": attr,
+                }
 
+                parent_span = trace.get_current_span()
+                context = trace.set_span_in_context(parent_span)
+
+                with tracer.start_as_current_span(
+                    name=f"use_case:{self.name}",
+                    kind=SpanKind.INTERNAL,
+                    context=context
+                ):
                     try:
-                        result = await attr(*args, **kwargs)
+                        result = await orig_attr(*args, **kwargs)
 
                         self.success_counter.add(1, labels)
 
@@ -192,4 +233,5 @@ class UseCaseWithMetricsProxy(Generic[UseCaseType]):
 
             return wrapper
 
-        return orig_attr
+        else:
+            return orig_attr

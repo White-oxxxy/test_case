@@ -1,4 +1,5 @@
 from opentelemetry import trace
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.trace import TracerProvider
 from opentelemetry.sdk.trace.export import BatchSpanProcessor
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
@@ -14,8 +15,14 @@ span_processor = BatchSpanProcessor(otlp_trace_exporter)
 
 current_trace_provider = trace.get_tracer_provider()
 
+resource = Resource(
+    attributes={
+        "service.name": "text_service",
+    }
+)
+
 if not isinstance(current_trace_provider, TracerProvider):
-    trace_provider = TracerProvider()
+    trace_provider = TracerProvider(resource=resource)
     trace_provider.add_span_processor(span_processor)
     trace.set_tracer_provider(trace_provider)
 

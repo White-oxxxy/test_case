@@ -1,9 +1,16 @@
 from fastapi import (
     FastAPI,
     Request,
+    status,
 )
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
 
+from domain.values.exceptions import (
+    TextTooLongException,
+    TextTooShortException,
+)
 from infra.pg.repositories.exceptions.common import EmptyDataException
 from infra.pg.repositories.exceptions.text import (
     TextAlreadyExistException,
@@ -24,6 +31,30 @@ def setup_exception_handler(app: FastAPI) -> None:
 
         return response
 
+    @app.exception_handler(TextTooLongException)
+    async def handel_text_too_long_exception(
+        request: Request,
+        exc: TextTooLongException,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail=exc.message,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+
+        return response
+
+    @app.exception_handler(TextTooShortException)
+    async def handel_text_too_short_exception(
+        request: Request,
+        exc: TextTooShortException,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail=exc.message,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+
+        return response
+
     @app.exception_handler(EmptyDataException)
     async def handle_empty_data(
         request: Request,
@@ -31,7 +62,7 @@ def setup_exception_handler(app: FastAPI) -> None:
     ) -> JSONResponse:
         response: JSONResponse = _build_response(
             detail=exc.message,
-            status_code=404
+            status_code=status.HTTP_404_NOT_FOUND
         )
 
         return response
@@ -43,7 +74,7 @@ def setup_exception_handler(app: FastAPI) -> None:
     ) -> JSONResponse:
         response: JSONResponse = _build_response(
             detail=exc.message,
-            status_code=409
+            status_code=status.HTTP_409_CONFLICT,
         )
 
         return response
@@ -55,7 +86,7 @@ def setup_exception_handler(app: FastAPI) -> None:
     ) -> JSONResponse:
         response: JSONResponse = _build_response(
             detail=exc.message,
-            status_code=404
+            status_code=status.HTTP_404_NOT_FOUND,
         )
 
         return response
@@ -67,7 +98,7 @@ def setup_exception_handler(app: FastAPI) -> None:
     ) -> JSONResponse:
         response: JSONResponse = _build_response(
             detail=exc.message,
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
 
         return response
@@ -79,7 +110,43 @@ def setup_exception_handler(app: FastAPI) -> None:
     ) -> JSONResponse:
         response: JSONResponse = _build_response(
             detail=exc.message,
-            status_code=500,
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+        return response
+
+    @app.exception_handler(RequestValidationError)
+    async def handel_request_validation_error(
+        request: Request,
+        exc: RequestValidationError,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail="Ошибка валидации запроса!",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+        return response
+
+    @app.exception_handler(ValidationError)
+    async def handel_pydantic_validation_error(
+        request: Request,
+        exc: ValidationError,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail="Ошибка валидации пайдентика!",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+        return response
+
+    @app.exception_handler(Exception)
+    async def handle_generic_exception(
+        request: Request,
+        exc: Exception,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail="Ошибка сервера",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
         return response

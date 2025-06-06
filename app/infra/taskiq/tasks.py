@@ -1,16 +1,15 @@
 from typing import Any
 
 from dishka.integrations.taskiq import (
-    inject,
     FromDishka,
+    inject,
 )
 
-from app.infra.taskiq.task_app import taskiq_broker
 from core.settings.base import CommonSettings
 from domain.entities import Text
 from domain.infra.repositories import ITextReadRepositoryOrm
-from domain.infra.cache import ICacheManager
-from infra.pg.dao import Session
+from domain.infra.cache import IWriteCacheManager
+from infra.taskiq.task_app import taskiq_broker
 from infra.redis.keys import TextAll
 
 
@@ -18,17 +17,17 @@ from infra.redis.keys import TextAll
 @inject(patch_module=True)
 async def regenerate_cache_get_all_texts(
     settings: FromDishka[CommonSettings],
-    text_repo: FromDishka[ITextReadRepositoryOrm[Session]],
-    cache_manager: FromDishka[ICacheManager],
+    text_repo: FromDishka[ITextReadRepositoryOrm],
+    cache_manager: FromDishka[IWriteCacheManager],
+    trace_carrier: dict[str, str] | None = None,
 ) -> None:
     cache_key = TextAll().message
 
     texts: list[Text] = await text_repo.get_all()
 
-    serializable_texts: dict[str, dict[str, Any]] = {}
-
-    for text in texts:
-        serializable_texts[str(text.oid)] = text.to_dict()
+    serializable_texts: dict[str, dict[str, Any]] = {
+        str(text.oid): text.to_dict() for text in texts
+    }
 
     await cache_manager.upsert(
         key=cache_key,

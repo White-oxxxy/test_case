@@ -30,7 +30,7 @@ target_metadata = BaseOrm.metadata
 
 settings = get_settings()
 
-config.set_main_option("sqlalchemy.url", value=settings.pg.postgres_url)
+config.set_main_option("sqlalchemy.url", value=settings.pg.migration_url)
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

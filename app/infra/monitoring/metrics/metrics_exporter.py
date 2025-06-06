@@ -1,3 +1,4 @@
+from opentelemetry.sdk.resources import Resource
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.metrics.export import PeriodicExportingMetricReader
 from opentelemetry.exporter.prometheus import PrometheusMetricReader
@@ -17,8 +18,17 @@ prometheus_reader = PrometheusMetricReader()
 
 current_metrics_provider = metrics.get_meter_provider()
 
+resource = Resource(
+    attributes={
+        "service.name": "text_service",
+    }
+)
+
 if not isinstance(current_metrics_provider, MeterProvider):
-    metrics_provider = MeterProvider(metric_readers=[prometheus_reader, otlp_metric_reader])
+    metrics_provider = MeterProvider(
+        metric_readers=[prometheus_reader, otlp_metric_reader],
+        resource=resource,
+    )
     metrics.set_meter_provider(metrics_provider)
 
 else:

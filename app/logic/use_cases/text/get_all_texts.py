@@ -3,7 +3,10 @@ from typing import Any
 
 from domain.entities import Text
 from domain.infra.repositories import ITextReadRepositoryOrm
-from domain.infra.cache import ICacheManager
+from domain.infra.cache import (
+    IWriteCacheManager,
+    IReadCacheManager,
+)
 from domain.logic import (
     BaseUseCase,
     BaseCommand,
@@ -11,6 +14,7 @@ from domain.logic import (
 )
 from infra.pg.dao import Session
 from infra.redis.exceptions import ValueDoesntExistException
+from infra.redis.manager import RedisConnection
 from infra.redis.keys import TextAll
 
 
@@ -27,7 +31,8 @@ class GetAllTextResult(BaseResult):
 @dataclass
 class GetAllTextsUseCase(BaseUseCase):
     text_repo: ITextReadRepositoryOrm[Session]
-    cache_manager: ICacheManager
+    write_cache_manager: IWriteCacheManager[RedisConnection]
+    read_cache_manager: IReadCacheManager[RedisConnection]
 
     async def act(self, command: GetAllTextCommand) -> GetAllTextResult:
         cache_key: str = TextAll().message
@@ -40,7 +45,7 @@ class GetAllTextsUseCase(BaseUseCase):
             for text in text_entities:
                 serializable_texts[str(text.oid)] = text.to_dict()
 
-            await self.cache_manager.set(
+            await self.write_cache_manager.set(
                 key=cache_key,
                 value=serializable_texts,
                 cache_exp=command.cache_exp,
@@ -59,7 +64,7 @@ class GetAllTextsUseCase(BaseUseCase):
 
     async def _get_cache(self, key: str) -> dict[str, dict[str, Any]] | None:
         try:
-            result: dict = await self.cache_manager.get(key=key)
+            result: dict = await self.read_cache_manager.get(key=key)
 
         except ValueDoesntExistException:
             return None

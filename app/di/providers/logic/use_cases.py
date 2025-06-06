@@ -5,8 +5,14 @@ from dishka import (
 )
 
 from domain.mappers import TextEntityMapper
-from domain.infra.repositories import ITextRepositoryOrm
-from domain.infra.cache import ICacheManager
+from domain.infra.repositories import (
+    ITextWriteRepositoryOrm,
+    ITextReadRepositoryOrm,
+)
+from domain.infra.cache import (
+    IWriteCacheManager,
+    IReadCacheManager,
+)
 from domain.logic.services import IAddTextService
 from infra.monitoring.metrics.custom_metrics import (
     use_case_duration,
@@ -14,8 +20,8 @@ from infra.monitoring.metrics.custom_metrics import (
     use_case_success_counter,
     use_case_error_counter,
 )
-from infra.monitoring.proxies import UseCaseType
-from infra.monitoring.fabrics import wrap_use_case_with_metrics
+from infra.monitoring.instruments.proxies import UseCaseType
+from infra.monitoring.instruments.fabrics import wrap_use_case_with_metrics
 from logic.use_cases import (
     AddTextUseCase,
     DeleteTextByOidUseCase,
@@ -49,7 +55,7 @@ class UseCasesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def create_delete_text_by_oid_use_case(
         self,
-        text_repo: ITextRepositoryOrm,
+        text_repo: ITextWriteRepositoryOrm,
     ) -> DeleteTextByOidUseCase:
         use_case_name = "delete_by_oid"
 
@@ -65,14 +71,16 @@ class UseCasesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def create_get_all_text_use_case(
         self,
-        text_repo: ITextRepositoryOrm,
-        cache_manager: ICacheManager,
+        text_repo: ITextReadRepositoryOrm,
+        write_cache_manager: IWriteCacheManager,
+        read_cache_manager: IReadCacheManager,
     ) -> GetAllTextsUseCase:
         use_case_name = "get_all_texts"
 
         use_case = GetAllTextsUseCase(
             text_repo=text_repo,
-            cache_manager=cache_manager,
+            write_cache_manager=write_cache_manager,
+            read_cache_manager=read_cache_manager,
         )
 
         proxy: GetAllTextsUseCase = self._wrap(
@@ -85,14 +93,16 @@ class UseCasesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def create_get_texts_by_count_use_case(
         self,
-        text_repo: ITextRepositoryOrm,
-        cache_manager: ICacheManager,
+        text_repo: ITextReadRepositoryOrm,
+        write_cache_manager: IWriteCacheManager,
+        read_cache_manager: IReadCacheManager,
     ) -> GetTextsByCountUseCase:
         use_case_name = "get_texts_by_count"
 
         use_case = GetTextsByCountUseCase(
             text_repo=text_repo,
-            cache_manager=cache_manager,
+            write_cache_manager=write_cache_manager,
+            read_cache_manager=read_cache_manager,
         )
 
         proxy: GetTextsByCountUseCase = self._wrap(
@@ -105,14 +115,16 @@ class UseCasesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def create_get_text_by_oid_use_case(
         self,
-        text_repo: ITextRepositoryOrm,
-        cache_manager: ICacheManager,
+        text_repo: ITextReadRepositoryOrm,
+        write_cache_manager: IWriteCacheManager,
+        read_cache_manager: IReadCacheManager,
     ) -> GetTextByOidUseCase:
         use_case_name = "get_text_by_oid"
 
         use_case = GetTextByOidUseCase(
             text_repo=text_repo,
-            cache_manager=cache_manager,
+            write_cache_manager=write_cache_manager,
+            read_cache_manager=read_cache_manager,
         )
 
         proxy: GetTextByOidUseCase = self._wrap(
