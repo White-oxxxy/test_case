@@ -4,7 +4,10 @@ from uuid import UUID
 
 from domain.entities import Text
 from domain.infra.repositories import ITextReadRepositoryOrm
-from domain.infra.cache import ICacheManager
+from domain.infra.cache import (
+    IWriteCacheManager,
+    IReadCacheManager,
+)
 from domain.logic import (
     BaseUseCase,
     BaseCommand,
@@ -13,6 +16,7 @@ from domain.logic import (
 from infra.pg.dao import Session
 from infra.redis.exceptions import ValueDoesntExistException
 from infra.redis.keys import TextByOid
+from infra.redis.manager import RedisConnection
 
 
 @dataclass
@@ -29,7 +33,8 @@ class GetTextByOidResult(BaseResult):
 @dataclass
 class GetTextByOidUseCase(BaseUseCase):
     text_repo: ITextReadRepositoryOrm[Session]
-    cache_manager: ICacheManager
+    write_cache_manager: IWriteCacheManager[RedisConnection]
+    read_cache_manager: IReadCacheManager[RedisConnection]
 
     async def act(self, command: GetTextByOidCommand) -> GetTextByOidResult:
         cache_key: str = TextByOid(oid=command.text_oid).message
@@ -40,7 +45,7 @@ class GetTextByOidUseCase(BaseUseCase):
 
             serializable_text: dict[str, Any] = text_entity.to_dict()
 
-            await self.cache_manager.set(
+            await self.write_cache_manager.set(
                 key=cache_key,
                 value=serializable_text,
                 cache_exp=command.cache_exp,
@@ -55,7 +60,7 @@ class GetTextByOidUseCase(BaseUseCase):
 
     async def _get_cache(self, key: str) -> dict[str, Any] | None:
         try:
-            result: dict = await self.cache_manager.get(key=key)
+            result: dict = await self.read_cache_manager.get(key=key)
 
         except ValueDoesntExistException:
             return None

@@ -1,5 +1,3 @@
-from uuid import UUID
-
 from dishka.integrations.fastapi import FromDishka
 from dishka.integrations.fastapi import inject
 from fastapi import (

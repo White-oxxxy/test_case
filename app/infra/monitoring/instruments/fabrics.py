@@ -5,7 +5,7 @@ from opentelemetry.sdk.metrics import (
     Counter,
 )
 
-from .proxies import (
+from infra.monitoring.instruments.proxies import (
     UseCaseWithMetricsProxy,
     UseCaseType,
     ServiceWithMetricsProxy,

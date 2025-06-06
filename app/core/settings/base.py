@@ -22,14 +22,20 @@ class PostgresSettings(BaseSettings):
     def read_database_url(self) -> str:
         return f"postgresql+asyncpg://{self.user}:{self.password}@{self.pgbouncer_host}:{self.pgbouncer_port}/read_db"
 
+    @property
+    def migration_url(self) -> str:
+        return f"postgresql+asyncpg://{self.user}:{self.password}@localhost:45432/text"
+
 
 class RedisSettings(BaseSettings):
     model_config = SettingsConfigDict(extra="allow")
 
     user: str = Field(alias="REDIS_USER", default="REDIS_USER")
     password: str = Field(alias="REDIS_PASSWORD", default="REDIS_PASSWORD")
-    host: str = Field(alias="REDIS_HOST", default="localhost")
-    port: int = Field(alias="REDIS_PORT", default=6379)
+    master_host: str = Field(alias="REDIS_MASTER_HOST", default="localhost")
+    slave_host: str = Field(alias="REDIS_SLAVE_HOST", default="localhost")
+    master_port: int = Field(alias="REDIS_MASTER_PORT", default=6379)
+    slave_port: int = Field(alias="REDIS_SLAVE_PORT", default=6379)
     cache_life_time: int = Field(alias="REDIS_CACHE_LIFE_TIME", default=600)
 
 

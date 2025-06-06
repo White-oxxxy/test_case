@@ -24,3 +24,7 @@ class GetTextsByCountOutSchema(BaseModel):
 
 class DeleteTextByOidInSchema(BaseModel):
     oid: str
+
+
+class HealthCheckOutSchema(BaseModel):
+    status: str

@@ -4,7 +4,7 @@ from dishka import (
     provide,
 )
 
-from domain.infra.repositories import ITextRepositoryOrm
+from domain.infra.repositories import ITextWriteRepositoryOrm
 from domain.logic.services import IAddTextService
 from logic.services import AddTextService
 from infra.monitoring.metrics.custom_metrics import (
@@ -13,15 +13,15 @@ from infra.monitoring.metrics.custom_metrics import (
     service_success_counter,
     service_error_counter,
 )
-from infra.monitoring.proxies import ServiceType
-from infra.monitoring.fabrics import wrap_service_with_metrics
+from infra.monitoring.instruments.proxies import ServiceType
+from infra.monitoring.instruments.fabrics import wrap_service_with_metrics
 
 
 class ServicesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def create_add_text_service(
         self,
-        text_repo: ITextRepositoryOrm,
+        text_repo: ITextWriteRepositoryOrm,
     ) -> IAddTextService:
         service_name = "add_text"
 

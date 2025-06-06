@@ -1,14 +1,12 @@
+from dishka import AsyncContainer
 from dishka.integrations import fastapi as fastapi_integration
-from dishka.integrations import taskiq as taskiq_integration
 from fastapi import FastAPI
-from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 
 from application.lifespan import lifespan
 from application.api.text.handlers import router as text_router
 from application.api.text.handlers import setup_exception_handler
-from application.api.text.handlers.middlewares import setup_middlewares
-from di import container
-from infra.taskiq.task_app import taskiq_broker
+from application.api.text.handlers.middlewares import setup_middlewares as setup_fastapi_middlewares
+from di import get_container
 
 
 def create_app() -> FastAPI:
@@ -22,13 +20,12 @@ def create_app() -> FastAPI:
     )
     app.include_router(router=text_router)
 
-    setup_middlewares(app=app)
-
-    FastAPIInstrumentor.instrument_app(app=app)
-
     setup_exception_handler(app=app)
 
+    setup_fastapi_middlewares(app=app)
+
+    container: AsyncContainer = get_container()
+
     fastapi_integration.setup_dishka(container=container, app=app)
-    taskiq_integration.setup_dishka(container=container, broker=taskiq_broker)
 
     return app

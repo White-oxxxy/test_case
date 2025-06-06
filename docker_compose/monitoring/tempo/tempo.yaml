@@ -1,5 +1,6 @@
 server:
   http_listen_port: 3200
+  grpc_listen_port: 9095
 
 distributor:
   receivers:
@@ -21,7 +22,7 @@ storage:
   trace:
     backend: local
     local:
-      path: /var/tmp/tempo_data
+      path: /tmp/tempo_data
 
 compactor:
   compaction:
