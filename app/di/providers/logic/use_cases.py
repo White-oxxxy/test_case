@@ -36,7 +36,7 @@ class UseCasesProvider(Provider):
     def create_add_text_use_case(
         self,
         text_entity_mapper: TextEntityMapper,
-        text_service: IAddTextService
+        text_service: IAddTextService,
     ) -> AddTextUseCase:
         use_case_name = "add_text"
 
@@ -55,11 +55,11 @@ class UseCasesProvider(Provider):
     @provide(scope=Scope.REQUEST)
     def create_delete_text_by_oid_use_case(
         self,
-        text_repo: ITextWriteRepositoryOrm,
+        write_text_repo: ITextWriteRepositoryOrm,
     ) -> DeleteTextByOidUseCase:
         use_case_name = "delete_by_oid"
 
-        use_case = DeleteTextByOidUseCase(text_repo=text_repo)
+        use_case = DeleteTextByOidUseCase(write_text_repo=write_text_repo)
 
         proxy: DeleteTextByOidUseCase = self._wrap(
             use_case=use_case,
@@ -72,16 +72,10 @@ class UseCasesProvider(Provider):
     def create_get_all_text_use_case(
         self,
         text_repo: ITextReadRepositoryOrm,
-        write_cache_manager: IWriteCacheManager,
-        read_cache_manager: IReadCacheManager,
     ) -> GetAllTextsUseCase:
         use_case_name = "get_all_texts"
 
-        use_case = GetAllTextsUseCase(
-            text_repo=text_repo,
-            write_cache_manager=write_cache_manager,
-            read_cache_manager=read_cache_manager,
-        )
+        use_case = GetAllTextsUseCase(text_repo=text_repo)
 
         proxy: GetAllTextsUseCase = self._wrap(
             use_case=use_case,
@@ -94,16 +88,10 @@ class UseCasesProvider(Provider):
     def create_get_texts_by_count_use_case(
         self,
         text_repo: ITextReadRepositoryOrm,
-        write_cache_manager: IWriteCacheManager,
-        read_cache_manager: IReadCacheManager,
     ) -> GetTextsByCountUseCase:
         use_case_name = "get_texts_by_count"
 
-        use_case = GetTextsByCountUseCase(
-            text_repo=text_repo,
-            write_cache_manager=write_cache_manager,
-            read_cache_manager=read_cache_manager,
-        )
+        use_case = GetTextsByCountUseCase(text_repo=text_repo)
 
         proxy: GetTextsByCountUseCase = self._wrap(
             use_case=use_case,

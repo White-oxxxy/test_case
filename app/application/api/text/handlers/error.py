@@ -6,6 +6,7 @@ from fastapi import (
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from pydantic import ValidationError
+from sqlalchemy.exc import SQLAlchemyError
 
 from domain.values.exceptions import (
     TextTooLongException,
@@ -134,6 +135,18 @@ def setup_exception_handler(app: FastAPI) -> None:
     ) -> JSONResponse:
         response: JSONResponse = _build_response(
             detail="Ошибка валидации пайдентика!",
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+        return response
+
+    @app.exception_handler(SQLAlchemyError)
+    async def handel_db_exception(
+        request: Request,
+        exc: SQLAlchemyError,
+    ) -> JSONResponse:
+        response: JSONResponse = _build_response(
+            detail="Ошибка на строне движка базы данных!",
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 

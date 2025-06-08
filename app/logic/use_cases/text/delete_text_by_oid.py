@@ -23,8 +23,7 @@ class DeleteTextByOidResult(BaseResult):
 
 @dataclass
 class DeleteTextByOidUseCase(BaseUseCase):
-    text_repo: ITextWriteRepositoryOrm[Session]
-
+    write_text_repo: ITextWriteRepositoryOrm[Session]
 
     @with_trace_carrier
     async def act(
@@ -32,13 +31,9 @@ class DeleteTextByOidUseCase(BaseUseCase):
             command: DeleteTextByOidCommand,
             trace_carrier: dict[str, str] = None,
     ) -> DeleteTextByOidResult:
-        await self.text_repo.delete(text_oid=UUID(command.text_oid))
+        await self.write_text_repo.delete(text_oid=UUID(command.text_oid))
 
-        await self.text_repo.commit()
-
-        from infra.taskiq.tasks import regenerate_cache_get_all_texts
-
-        await regenerate_cache_get_all_texts.kiq(trace_carrier=trace_carrier)
+        await self.write_text_repo.commit()
 
         result = DeleteTextByOidResult()
 

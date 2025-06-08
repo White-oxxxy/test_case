@@ -16,15 +16,15 @@ class ITextWriteRepositoryOrm(
     ABC,
 ):
     @abstractmethod
-    async def create(
-            self,
-            text: Text,
+    async def add_texts(
+        self,
+        texts: list[Text],
     ) -> None: ...
 
     @abstractmethod
     async def delete(
-            self,
-            text_oid: UUID,
+        self,
+        text_oid: UUID,
     ) -> None: ...
 
 

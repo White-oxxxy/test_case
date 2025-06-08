@@ -46,18 +46,23 @@ async def add_text_handler(
     schema: CreateTextSchema,
     use_case: FromDishka[AddTextUseCase],
 ) -> CreateTextOutSchema:
-    command = AddTextCommand(content=schema.content)
+    command = AddTextCommand(contents=schema.contents)
 
     use_case_result: AddTextResult = await use_case.act(command=command)
 
-    text_result = TextSchema(
-        oid=str(use_case_result.text.oid),
-        content=use_case_result.text.content.as_genetic_type(),
-    )
+    texts_result: list[TextSchema] = []
+    for text in use_case_result.texts:
+        content = text.content
+
+        text_result = TextSchema(
+            oid=str(text.oid),
+            content=content.as_genetic_type(),
+        )
+        texts_result.append(text_result)
 
     result = CreateTextOutSchema(
-        message="Текст успешно добавлен!",
-        text=text_result,
+        message="Текста успешно добавлены!",
+        text=texts_result,
     )
 
     return result
@@ -86,10 +91,9 @@ async def delete_text_by_oid_handler(
 )
 @inject
 async def get_all_texts_handler(
-    settings: FromDishka[CommonSettings],
     use_case: FromDishka[GetAllTextsUseCase],
 ) -> GetAllTextsOutSchema:
-    command = GetAllTextCommand(cache_exp=settings.redis.cache_life_time)
+    command = GetAllTextCommand()
 
     use_case_result: GetAllTextResult = await use_case.act(command=command)
 
@@ -117,13 +121,9 @@ async def get_all_texts_handler(
 @inject
 async def get_texts_by_count_handler(
     count: int,
-    settings: FromDishka[CommonSettings],
     use_case: FromDishka[GetTextsByCountUseCase],
 ) -> GetTextsByCountOutSchema:
-    command = GetTextsByCountCommand(
-        count=count,
-        cache_exp=settings.redis.cache_life_time,
-    )
+    command = GetTextsByCountCommand(count=count)
 
     use_case_result: GetTextsByCountResult = await use_case.act(command=command)
 

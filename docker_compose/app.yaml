@@ -9,25 +9,12 @@ services:
       - ../.dev.env
     ports:
       - "8000:8000"
-    command: "uvicorn application.main:create_app --host 0.0.0.0 --port 8000 --factory --lifespan on"
+    command: "uvicorn application.main:create_app --host 0.0.0.0 --port 8000 --factory"
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8000/api/text/health" ]
       interval: 5s
       timeout: 3s
       retries: 10
-    networks:
-      - backend
-
-  taskiq-worker:
-    container_name: taskiq_worker
-    build:
-      context: ..
-      dockerfile: Dockerfile
-    image: taskiq_worker
-    env_file:
-      - ../.dev.env
-    ports: [ ]
-    command: [ taskiq, worker, -fsd, infra.taskiq.task_app:taskiq_broker, -w, "1", --max-fails, "1"]
     networks:
       - backend
 

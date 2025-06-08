@@ -25,13 +25,19 @@ class TextWriteRepositoryOrm(
 ):
     text_dao: ITextWriteDao[TextOrm, Session]
 
-    async def create(
+    async def add_texts(
         self,
-        text: Text,
+        texts: list[Text],
     ) -> None:
-        await self.text_dao.create(
-            oid=text.oid,
-            content=text.content.as_genetic_type(),
+        oids: list[UUID] = []
+        contents: list[str] = []
+        for text in texts:
+            oids.append(text.oid)
+            contents.append(text.content.as_genetic_type())
+
+        await self.text_dao.add_texts(
+            oids=oids,
+            contents=contents,
         )
 
     async def delete(

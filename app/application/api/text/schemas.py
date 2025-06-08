@@ -7,12 +7,12 @@ class TextSchema(BaseModel):
 
 
 class CreateTextSchema(BaseModel):
-    content: str
+    contents: list[str]
 
 
 class CreateTextOutSchema(BaseModel):
     message: str
-    text: TextSchema
+    text: list[TextSchema]
 
 
 class GetAllTextsOutSchema(BaseModel):

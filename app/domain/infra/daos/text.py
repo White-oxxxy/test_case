@@ -18,16 +18,16 @@ class ITextWriteDao(
     ABC,
 ):
     @abstractmethod
-    async def create(
-            self,
-            oid: UUID,
-            content: str,
+    async def add_texts(
+        self,
+        oids: list[UUID],
+        contents: list[str],
     ) -> None: ...
 
     @abstractmethod
     async def delete(
-            self,
-            text_oid: UUID,
+        self,
+        text_oid: UUID,
     ) -> ModelType | None: ...
 
 

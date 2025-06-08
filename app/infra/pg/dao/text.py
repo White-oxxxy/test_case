@@ -24,17 +24,18 @@ class TextWriteDao(
     ITextWriteDao[TextOrm, Session],
 
 ):
-    async def create(
+    async def add_texts(
         self,
-        oid: UUID,
-        content: str,
+        oids: list[UUID],
+        contents: list[str],
     ) -> None:
-        text = TextOrm(
-            oid=oid,
-            content=content,
-        )
+        texts = [
+            TextOrm(oid=oid, content=content)
+            for oid, content in zip(oids, contents)
+        ]
 
-        self.session.add(text)
+        self.session.add_all(texts)
+
 
     async def delete(
         self,

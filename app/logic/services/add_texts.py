@@ -13,9 +13,9 @@ from infra.pg.repositories.exceptions.text import TextAlreadyExistException
 class AddTextService(IAddTextService):
     text_repo: ITextWriteRepositoryOrm[Session]
 
-    async def act(self, text: Text) -> None:
+    async def act(self, texts: list[Text]) -> None:
         try:
-            await self.text_repo.create(text=text)
+            await self.text_repo.add_texts(texts=texts)
             await self.text_repo.commit()
 
         except IntegrityError:

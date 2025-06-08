@@ -2,7 +2,6 @@ from dishka import AsyncContainer
 from dishka.integrations import fastapi as fastapi_integration
 from fastapi import FastAPI
 
-from application.lifespan import lifespan
 from application.api.text.handlers import router as text_router
 from application.api.text.handlers import setup_exception_handler
 from application.api.text.handlers.middlewares import setup_middlewares as setup_fastapi_middlewares
@@ -16,7 +15,6 @@ def create_app() -> FastAPI:
         description="",
         root_path="/api",
         debug=False,
-        lifespan=lifespan,
     )
     app.include_router(router=text_router)
 

@@ -1,4 +1,4 @@
-from .add_text import AddTextService
+from .add_texts import AddTextService
 
 
 __all__ = (

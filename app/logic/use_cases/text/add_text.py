@@ -13,12 +13,12 @@ from infra.monitoring.instruments.decorators import with_trace_carrier
 
 @dataclass
 class AddTextCommand(BaseCommand):
-    content: str
+    contents: list[str]
 
 
 @dataclass
 class AddTextResult(BaseResult):
-    text: Text
+    texts: list[Text]
 
 
 @dataclass
@@ -32,14 +32,15 @@ class AddTextUseCase(BaseUseCase):
         command: AddTextCommand,
         trace_carrier: dict[str, str] = None,
     ) -> AddTextResult:
-        text: Text = self.text_entity_mapper.create_text(content=command.content)
+        text_entities: list[Text] = []
 
-        await self.text_service.act(text=text)
+        for content in command.contents:
+            text: Text = self.text_entity_mapper.create_text(content=content)
 
-        from infra.taskiq.tasks import regenerate_cache_get_all_texts
+            text_entities.append(text)
 
-        await regenerate_cache_get_all_texts.kiq(trace_carrier=trace_carrier)
+        await self.text_service.act(texts=text_entities)
 
-        result = AddTextResult(text=text)
+        result = AddTextResult(texts=text_entities)
 
         return result
